@@ -22,6 +22,11 @@ mongoose.connect(url)
 app.use('/api', authRoutes);        
 app.use('/api', medicalRoutes);  
 
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
