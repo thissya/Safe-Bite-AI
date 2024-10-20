@@ -39,14 +39,12 @@ pipeline = transformers.pipeline(
     device=0
 )
 
-ngrok_auth_token = os.getenv("NGROK_AUTH_TOKEN")
+ngrok_auth_token = "2lC10VNMNNHozy9qU2wBzosN3at_3QYjZW2FJ2sr1po7qXqqs"
 if ngrok_auth_token is None:
     raise ValueError("NGROK_AUTH_TOKEN is not set")
 ngrok.set_auth_token(ngrok_auth_token)
 
-# Ngrok configuration
-ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
-listener = ngrok.forward("127.0.0.1:8000", authtoken_from_env=True, domain=os.getenv("NGROK_DOMAIN"))
+listener = ngrok.forward("127.0.0.1:8000", authtoken_from_env=True, domain="sterling-python-willingly.ngrok-free.app")
 
 user_histories = {}
 
@@ -87,7 +85,7 @@ async def message(request: ValidateRequest):
         user_message = request.message
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, user_message, history)
-        user_histories[user_id] = updated_history[-3:]  # Retain last 3 interactions
+        user_histories[user_id] = updated_history[-3:]  
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
