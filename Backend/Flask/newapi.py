@@ -39,6 +39,11 @@ pipeline = transformers.pipeline(
     device=0
 )
 
+ngrok_auth_token = os.getenv("NGROK_AUTH_TOKEN")
+if ngrok_auth_token is None:
+    raise ValueError("NGROK_AUTH_TOKEN is not set")
+ngrok.set_auth_token(ngrok_auth_token)
+
 # Ngrok configuration
 ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
 listener = ngrok.forward("127.0.0.1:8000", authtoken_from_env=True, domain=os.getenv("NGROK_DOMAIN"))
