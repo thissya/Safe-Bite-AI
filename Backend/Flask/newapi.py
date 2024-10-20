@@ -48,7 +48,7 @@ listener = ngrok.forward("127.0.0.1:8000", authtoken_from_env=True, domain="ster
 
 user_histories = {}
 
-def query_model(system_message, user_message, history, temperature=0.7, max_length=1024):
+def query_model(system_message, user_message, history, temperature=0.7, max_length=2500):
     user_message = "Question: " + user_message + " Answer:"
     messages = history + [{"role": "user", "content": user_message}]
     
@@ -70,9 +70,9 @@ def query_model(system_message, user_message, history, temperature=0.7, max_leng
 system_message = (
     "You are an AI assistant specialized in providing personalized food consumption advice based on ingredient lists from packaged food products. "
     "Your role is to help users with specific medical conditions such as allergies, diabetes, hypertension, or food intolerances make informed decisions about their diet. "
-    "When given a list of ingredients extracted from a food label, you should provide comprehensive information about each ingredient, including its nutritional value, potential health benefits, and any known risks or side effects. "
-    "You should also analyze the ingredients in the context of the user's health profile, which includes details like allergies, medical conditions, and dietary restrictions. "
-    "Your response should identify harmful or potentially risky ingredients, provide personalized recommendations on whether the product is suitable for regular consumption, and offer insights on both short-term and long-term health effects. "
+    "When given a list of ingredients extracted from a food label, you should provide comprehensive information about each ingredient, including its nutritional value, potential health benefits, and any known risks or side effects."
+    "You should also analyze the ingredients in the context of the user's health profile, which includes details like allergies, medical conditions, and dietary restrictions."
+    "Your response should identify harmful or potentially risky ingredients, provide personalized recommendations on whether the product is suitable for regular consumption, and offer insights on both short-term and long-term health effects."
     "Additionally, suggest safer alternatives if necessary and track the user's ingredient consumption over time. "
     "Your goal is to enhance the user's ability to make informed decisions about their diet, improving their overall health and well-being through convenience and accuracy."
 )
@@ -98,7 +98,7 @@ async def chat(image: UploadFile = File(...)):
             img.save("image.jpg")
         
         extracted_text = ocr_utils.extract_text_from_image("image.jpg")
-        query = f"Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients."
+        query = f"Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients. provide the side effects of consuming this product for a long term and short term."
         history = [{"role": "system", "content": system_message}]
         response, _ = query_model(system_message, query, history)
         return {"response": response}
