@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const {signup,login,image_for_OCR}= require('../controller/authcontroller');
+const {signup,login,getuser}= require('../controller/authcontroller');
 
-const multer = require('multer'); 
-const upload = multer({dest: 'uploads/'});
+const authenticateToken = require('../middleware/authMiddleware');
 
 router.post('/signup',signup);
 router.post('/login',login);
-
-router.post('/upload',upload.single('image'),image_for_OCR);
+router.get('/profile',authenticateToken,getuser);
 
 module.exports = router;

@@ -4,10 +4,8 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const router = express.Router();
 
-const { exec } = require('child_process');
 router.use(express.json());
 
-const path=require('path');
 
 const signup = async (req, res) => {
     const { name, email, password, confirmPassword, age, gender } = req.body;
@@ -74,26 +72,16 @@ const login = async (req, res) => {
     }
 }
 
-
-const image_for_OCR = async (req, res) => {
-    if (!req.file) {
-        console.error("No file uploaded");
-        return res.status(400).json({ error: "No file uploaded" });
-    }
-
-    const imagePath = path.join(__dirname, '..', req.file.path);
-    console.log(`Executing Python script with image path: ${imagePath}`);
-    const scriptPath = path.join(__dirname, '../../Ingredient-Safety-Analyzer-using-Tesseract-OCR/Ingredient_Inspector/main.py');
-    const command = `python "${scriptPath.replace(/\\/g, '\\\\')}" "${imagePath.replace(/\\/g, '\\\\')}"`;
-    console.log(`Executing command: ${command}`);
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error executing Python script: ${stderr}`);
-            return res.status(500).json({ error: stderr });
+const getuser =async(req,res)=>{
+    try{
+        const exist_user = await user.findById(req.user.id);
+        if(!exist_user){
+            res.status(400).json({msg:"User not found"});
         }
-        console.log(`Python script output: ${stdout}`);
-        res.status(200).json({ extractedText: stdout });
-    });
-};
+        res.status(200).send({name:exist_user.name,age:exist_user.age,gender:exist_user.gender,medicalCondition:exist_user.medicalCondition});
+    }catch(err){
+        res.status(200).send(err.message);
+    }
+}
 
-module.exports = { signup, login, image_for_OCR };
+module.exports = { signup, login ,getuser};
