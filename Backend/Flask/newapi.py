@@ -98,7 +98,7 @@ async def chat(image: UploadFile = File(...)):
             img.save("image.jpg")
         
         extracted_text = ocr_utils.extract_text_from_image("image.jpg")
-        query = f"Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients. provide the side effects of consuming this product for a long term and short term."
+        query = f"Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients. provide the side effects of consuming this product for a long term and short term. provide within 500 words."
         history = [{"role": "system", "content": system_message}]
         response, _ = query_model(system_message, query, history)
         return {"response": response}
