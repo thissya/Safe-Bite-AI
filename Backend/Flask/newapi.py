@@ -32,10 +32,9 @@ app.add_middleware(
 # Model setup
 model = "/kaggle/input/llama-3/transformers/8b-chat-hf/1"
 tokenizer = AutoTokenizer.from_pretrained(model)
-llm_model = AutoModelForCausalLM.from_pretrained(model)
 pipeline = transformers.pipeline(
     "text-generation",
-    model=llm_model,
+    model=model,
     torch_dtype=torch.float16,
     device=0
 )
