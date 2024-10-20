@@ -36,7 +36,7 @@ pipeline = transformers.pipeline(
     "text-generation",
     model=model,
     torch_dtype=torch.float16,
-    device=0
+    device_map="auto"
 )
 
 ngrok_auth_token = "2lC10VNMNNHozy9qU2wBzosN3at_3QYjZW2FJ2sr1po7qXqqs"
