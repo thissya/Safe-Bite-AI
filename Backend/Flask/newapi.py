@@ -67,7 +67,6 @@ def query_model(system_message, user_message, history, temperature=0.7, max_leng
     answer = sequences[0]['generated_text']
     return answer, messages
 
-# System message for the assistant
 system_message = (
     "You are an AI assistant specialized in providing personalized food consumption advice based on ingredient lists from packaged food products. "
     "Your role is to help users with specific medical conditions such as allergies, diabetes, hypertension, or food intolerances make informed decisions about their diet. "
@@ -104,7 +103,6 @@ async def chat(image: UploadFile = File(...)):
         response, _ = query_model(system_message, query, history)
         return {"response": response}
     except Exception as e:
-        return {"error": "Error in processing the image or generating response"}
-
+        raise HTTPException(status_code=500, detail=str(e))
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
