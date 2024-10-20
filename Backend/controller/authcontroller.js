@@ -7,6 +7,8 @@ const router = express.Router();
 const { exec } = require('child_process');
 router.use(express.json());
 
+const path=require('path');
+
 const signup = async (req, res) => {
     const { name, email, password, confirmPassword, age, gender } = req.body;
     if (!name, !email, !password, !confirmPassword) {
@@ -36,7 +38,7 @@ const signup = async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ id: newUser._id }, process.env.KEY);
+        const token = jwt.sign({ id: newUser._id }, process.env.KEY,{expiresIn:'5h'});
 
         res.status(200).json({ msg: "User Created Successfully", token });
 
@@ -62,24 +64,36 @@ const login = async (req, res) => {
             return res.status(400).json({ msg: "Invalid Credentials" });
         }
 
-        const token = jwt.sign({ id: exist_user._id }, process.env.KEY);
+        const token = jwt.sign({ id: exist_user._id }, process.env.KEY,{expiresIn:'5h'});
         const firstlogin = !exist_user.medicalCondition || exist_user.medicalCondition.length === 0;
 
-        res.status(200).json({ token, firstlogin });
+        res.status(200).json({ token,userId:exist_user._id, firstlogin,msg:"logged in successfully" });
 
     } catch (err) {
         res.status(500).send(err.message);
     }
 }
 
+
 const image_for_OCR = async (req, res) => {
+    if (!req.file) {
+        console.error("No file uploaded");
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
     const imagePath = path.join(__dirname, '..', req.file.path);
-    exec(`python ../../Ingredient-Safety-Analyzer-using-Tesseract-OCR/Ingredient Inspector/main.py ${imagePath}`, (error, stdout, stderr) => {
+    console.log(`Executing Python script with image path: ${imagePath}`);
+    const scriptPath = path.join(__dirname, '../../Ingredient-Safety-Analyzer-using-Tesseract-OCR/Ingredient_Inspector/main.py');
+    const command = `python "${scriptPath.replace(/\\/g, '\\\\')}" "${imagePath.replace(/\\/g, '\\\\')}"`;
+    console.log(`Executing command: ${command}`);
+    exec(command, (error, stdout, stderr) => {
         if (error) {
+            console.error(`Error executing Python script: ${stderr}`);
             return res.status(500).json({ error: stderr });
         }
+        console.log(`Python script output: ${stdout}`);
         res.status(200).json({ extractedText: stdout });
     });
-}
+};
 
 module.exports = { signup, login, image_for_OCR };

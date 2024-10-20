@@ -1,5 +1,5 @@
 const express = require('express');
-const router= express.Router();
+const router = express.Router();
 const {signup,login,image_for_OCR}= require('../controller/authcontroller');
 
 const multer = require('multer'); 
