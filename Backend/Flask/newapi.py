@@ -37,7 +37,7 @@ pipeline = transformers.pipeline(
     "text-generation",
     model=llm_model,
     torch_dtype=torch.float16,
-    device_map="auto"
+    device=0
 )
 
 # Ngrok configuration
