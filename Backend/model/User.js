@@ -20,7 +20,8 @@ const UserSchema = new mongoose.Schema({
     },
     gender:{
         type:String,
-        required:false
+        required:false,
+        default: "Not Set"
     },
     medicalCondition:{ 
         type:[String],
