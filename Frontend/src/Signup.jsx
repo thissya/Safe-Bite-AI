@@ -45,6 +45,10 @@ const Signup = () => {
     }
   };
 
+  const handleLoginClick = () => {
+    navigate('/');
+  };
+
   return (
     <div className="h-screen bg-gray-300 bg-center flex items-center justify-center">
       <div className="bg-gray-100 p-8 rounded-lg shadow-md max-w-xs w-full">
@@ -91,13 +95,17 @@ const Signup = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
+          {error && <p>{error}</p>}
           <button
             type="submit"
             className="w-full bg-black text-white p-2 rounded mt-2"
           >
             Submit
           </button>
-        </form>
+          <div className="mt-4 text-center">
+          <a className="text-gray-500 text-sm">Already have an account ? <span className="text-blue-500" onClick={() => { navigate('/') }}>Login</span></a>
+        </div>      
+          </form>
       </div>
     </div>
   );
