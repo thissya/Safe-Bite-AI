@@ -95,12 +95,11 @@ const Signup = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
-          {error && <p>{error}</p>}
+         
           <button
             type="submit"
-            className="w-full bg-black text-white p-2 rounded mt-2"
-          >
-            Submit
+            className="w-full bg-black text-white p-2 rounded mt-2">
+            Sign in
           </button>
           <div className="mt-4 text-center">
           <a className="text-gray-500 text-sm">Already have an account ? <span className="text-blue-500" onClick={() => { navigate('/') }}>Login</span></a>

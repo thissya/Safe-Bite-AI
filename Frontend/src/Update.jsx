@@ -78,7 +78,7 @@ export default function Update() {
                   <select 
                     value={tempObj.gender} 
                     onChange={(e) => setTempObj({ ...tempObj, gender: e.target.value })} 
-                    className="p-2 mt-4"
+                    className="p-2 mt-4 border rounded"
                   >
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
