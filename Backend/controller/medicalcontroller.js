@@ -5,7 +5,7 @@ const FormData = require('form-data');
 const { Buffer } = require('buffer');
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+
 
 module.exports.update_medical_condition = async (req,res)=>{
     try{

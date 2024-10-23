@@ -112,7 +112,7 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
         
         query = f"""Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients and also
         provide whether user with {message} can consume it or not. provide the side effects of consuming this product for a 
-        long term and short term. provide within 200 words"""
+        long term and short term. provide within 300 words"""
 
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, query, history)
