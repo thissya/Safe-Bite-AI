@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 import transformers
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from time import time
 import ngrok
 import ocr_utils
@@ -49,7 +49,7 @@ listener = ngrok.forward("127.0.0.1:8000", authtoken_from_env=True, domain="ster
 
 user_histories = {}
 
-def query_model(system_message, user_message, history, temperature=0.7, max_length=2500):
+def query_model(system_message, user_message, history, temperature=0.7, max_length=1024):
     user_message = "Question: " + user_message + " Answer:"
     messages = history + [{"role": "user", "content": user_message}]
 
@@ -69,6 +69,7 @@ def query_model(system_message, user_message, history, temperature=0.7, max_leng
         do_sample=True,
         top_p=0.9,
         temperature=temperature,
+        eos_token_id=terminators,
         max_new_tokens=max_length,
         return_full_text=False,
         pad_token_id=pipeline.model.config.eos_token_id
@@ -84,7 +85,7 @@ system_message = """
     Your response should identify harmful or potentially risky ingredients, provide personalized recommendations on whether the product is suitable for regular consumption, and offer insights on both short-term and long-term health effects.
     Additionally, suggest safer alternatives if necessary and track the user's ingredient consumption over time. "
     Your goal is to enhance the user's ability to make informed decisions about their diet, improving their overall health and well-being through convenience and accuracy.
-    dont provide the answers in a json format """
+    dont return the text in the json format."""
 
 @app.post('/message')
 async def message(request: ValidateRequest):
@@ -113,7 +114,7 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
         
         query = f"""Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients and also
         provide whether user with {message} can consume it or not. provide the side effects of consuming this product for a 
-        long term and short term. think that you are a doctor and provide these informations. provide within 300 words"""
+        long term and short term. provide within 200 words"""
 
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, query, history)
