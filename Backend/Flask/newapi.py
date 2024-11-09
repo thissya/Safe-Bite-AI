@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 import transformers
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer
 from time import time
 import ngrok
 import ocr_utils
@@ -83,7 +83,8 @@ system_message = """
     You should also analyze the ingredients in the context of the user's health profile, which includes details like allergies, medical conditions, and dietary restrictions.
     Your response should identify harmful or potentially risky ingredients, provide personalized recommendations on whether the product is suitable for regular consumption, and offer insights on both short-term and long-term health effects.
     Additionally, suggest safer alternatives if necessary and track the user's ingredient consumption over time. "
-    Your goal is to enhance the user's ability to make informed decisions about their diet, improving their overall health and well-being through convenience and accuracy."""
+    Your goal is to enhance the user's ability to make informed decisions about their diet, improving their overall health and well-being through convenience and accuracy.
+    dont provide the answers in a json format """
 
 @app.post('/message')
 async def message(request: ValidateRequest):
@@ -112,7 +113,7 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
         
         query = f"""Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients and also
         provide whether user with {message} can consume it or not. provide the side effects of consuming this product for a 
-        long term and short term. provide within 300 words"""
+        long term and short term. think that you are a doctor and provide these informations. provide within 300 words"""
 
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, query, history)
@@ -124,4 +125,4 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80 00)

@@ -13,7 +13,6 @@ export default function ChatBot() {
 
   const { userInfo, userId } = useUser();
 
-  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [query, setQuery] = useState(null);
@@ -36,11 +35,9 @@ export default function ChatBot() {
   };
 
   const handleAPICall = async () => {
-    if (loading) return;
     if (query.trim() == "") {
       return;
     }
-    setLoading(true);
     try {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -52,6 +49,7 @@ export default function ChatBot() {
         formData.append('image', image);
         formData.append('user_id', `${userId} The user info is ${JSON.stringify(userInfo)}`);
         formData.append('message', query);
+        
         setImage(null);
         setImageUrl(null);
         setQuery("");
@@ -83,9 +81,7 @@ export default function ChatBot() {
           ]);
         }
       }
-      setLoading(false);
     } catch (e) {
-      setLoading(false);
       setMessages((prevMessages) => [
         ...prevMessages,
         { user: "bot", message: "Something went wrong. Please try again." }
@@ -136,7 +132,7 @@ export default function ChatBot() {
                   onChange={handleImageUpload}
                   ref={imageUploadRef}
                 />
-                <button><FontAwesomeIcon icon={faUpload} onClick={() => { imageUploadRef.current && imageUploadRef.current.click() }} /></button>
+                <button><FontAwesomeIcon icon={faUpload} onClick={() => { imageUploadRef.current.click() }} /></button>
                 <button onClick={handleAPICall}><FontAwesomeIcon icon={faPaperPlane} /></button>
               </div>
             </div>
