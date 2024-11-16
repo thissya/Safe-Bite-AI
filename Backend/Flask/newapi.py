@@ -7,7 +7,7 @@ from PIL import Image
 import io
 import os
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-from pyngrok import ngrok
+import ngrok
 from googletrans import Translator
 import ocr_utils
 
