@@ -13,6 +13,7 @@ import io
 import uvicorn
 import os
 from dotenv import load_dotenv
+from googletrans import Translator
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ app = FastAPI()
 class ValidateRequest(BaseModel):
     user_id: str
     message: str
+    language:str
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,6 +50,8 @@ ngrok.set_auth_token(ngrok_auth_token)
 listener = ngrok.forward("127.0.0.1:8000", authtoken_from_env=True, domain="sterling-python-willingly.ngrok-free.app")
 
 user_histories = {}
+
+translator = Translator()
 
 def query_model(system_message, user_message, history, temperature=0.7, max_length=1024):
     user_message = "Question: " + user_message + " Answer:"
@@ -93,16 +97,24 @@ async def message(request: ValidateRequest):
         global user_histories
         user_id = request.user_id
         user_message = request.message
+        language = request.language
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, user_message, history)
         user_histories[user_id] = updated_history[-3:]  
-        return JSONResponse(status_code=200, content={"response": response})
+
+        if language.lower() == "tamil":
+            return JSONResponse(status_code=200, content={"response": translator.translate(response, src='en', dest='ta').text})
+        elif language.lower() == "english": 
+            return JSONResponse(status_code=200, content={"response": response})
+        else:
+            return JSONResponse(status_code=400, content={"response": "Error in Language Selection"})
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post('/chat')
-async def chat(user_id: str = Form(...), image: UploadFile = File(...), message: str = Form(...)):
+async def chat(user_id: str = Form(...), image: UploadFile = File(...), message: str = Form(...),language: str = Form(...)):
     try:
         global user_histories
         image_content = await image.read()
@@ -119,8 +131,16 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, query, history)
         user_histories[user_id] = updated_history[-3:]
-        return JSONResponse(status_code=200, content={"response": response})
-    
+
+        if language.lower() == "tamil":
+            response = translator.translate(response, src='en', dest='ta').text 
+            print(response)
+            return JSONResponse(status_code=200, content={"response": response})
+        elif language.lower() == "english": 
+            return JSONResponse(status_code=200, content={"response": response})
+        else:
+            return JSONResponse(status_code=400, content={"response": "Error in Language Selection"})
+        
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
