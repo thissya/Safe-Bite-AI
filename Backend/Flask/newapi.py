@@ -13,6 +13,8 @@ import io
 import uvicorn
 import os
 from dotenv import load_dotenv
+from google.cloud import translate_v2 as translate
+
 
 load_dotenv()
 
@@ -21,6 +23,7 @@ app = FastAPI()
 class ValidateRequest(BaseModel):
     user_id: str
     message: str
+    language: str
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +32,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Google Translate setup
+translate_client = translate.Client()
+
+def translate_text(text, target_language):
+    result = translate_client.translate(text, target_language=target_language)
+    return result["translatedText"]
 
 # Model setup
 model = "/kaggle/input/llama-3/transformers/8b-chat-hf/1"
@@ -93,16 +103,19 @@ async def message(request: ValidateRequest):
         global user_histories
         user_id = request.user_id
         user_message = request.message
+        target_language = request.language
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, user_message, history)
-        user_histories[user_id] = updated_history[-3:]  
+        user_histories[user_id] = updated_history[-3:]
+        if target_language == "ta":
+            response = translate_text(response, "ta")
         return JSONResponse(status_code=200, content={"response": response})
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post('/chat')
-async def chat(user_id: str = Form(...), image: UploadFile = File(...), message: str = Form(...)):
+async def chat(user_id: str = Form(...), image: UploadFile = File(...), message: str = Form(...), language: str = Form(...)):
     try:
         global user_histories
         image_content = await image.read()
@@ -111,19 +124,16 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
             img.save("image.jpg")
         
         extracted_text = ocr_utils.extract_text_from_image("image.jpg")
-        
-        query = f"""Extracted ingredients: {extracted_text}. Provide detailed information about these ingredients and also
-        provide whether user with {message} can consume it or not. provide the side effects of consuming this product for a 
-        long term and short term. provide within 200 words"""
-
+        query = f"Extracted ingredients: {extracted_text}. {message} Provide suggestions in 200 words."
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, query, history)
         user_histories[user_id] = updated_history[-3:]
+        if language == "ta":
+            response = translate_text(response, "ta")
         return JSONResponse(status_code=200, content={"response": response})
-    
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
-
+    
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
