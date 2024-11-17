@@ -130,7 +130,7 @@ export default function ChatBot() {
                 className="py-2 px-4 border rounded"
               >
                 <option value="en">English</option>
-                <option value="ta">Tamil</option>
+                <option value="ta">தமிழ்</option>
               </select>
               <div className="flex flex-row mx-5 space-x-5">
                 <input
