@@ -13,7 +13,6 @@ export default function ChatBot() {
 
   const { userInfo, userId } = useUser();
 
-  const [language, setLanguage] = useState("english");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [query, setQuery] = useState(null);
@@ -50,8 +49,7 @@ export default function ChatBot() {
         formData.append('image', image);
         formData.append('user_id', `${userId} The user info is ${JSON.stringify(userInfo)}`);
         formData.append('message', query);
-        formData.append('language', language);
-
+        
         setImage(null);
         setImageUrl(null);
         setQuery("");
@@ -71,8 +69,7 @@ export default function ChatBot() {
         console.log(query);
         const tempObj = {
           user_id: userId,
-          message: `${query} The user info is ${JSON.stringify(userInfo)}`,
-          language: language
+          message: `${query} The user info is ${JSON.stringify(userInfo)}`
         };
         console.log(tempObj);
         setQuery("");
@@ -99,31 +96,15 @@ export default function ChatBot() {
       <div className="flex bg-slate-300 h-screen w-screen">
         <Navbar />
         <div className="flex flex-col px-4 justify-between w-full h-full">
-          <div className="flex flex-col items-end justify-between">
-            <button
-              className={`px-4 py-2 ${language === "english" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
-              onClick={() => setLanguage("english")}
-            >
-              English
-            </button>
-            <button
-              className={`px-4 py-2 ${language === "tamil" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
-              onClick={() => setLanguage("tamil")}
-            >
-              தமிழ்
-            </button>
-          </div>
-
           <div className="flex flex-col overflow-y-auto mb-3 mt-1">
             {messages.map((val, index) => (
               <>
-                {val.user === "user" && <UserInputBubble key={index} user={val} />}
-                {val.user === "bot" && <BotMessageBubble key={index} bot={val} />}
+                {val.user == "user" && <UserInputBubble key={index} user={val} />}
+                {val.user == "bot" && <BotMessageBubble key={index} bot={val} />}
               </>
             ))}
             <div ref={messageEndRef}></div>
           </div>
-
           <div className="p-2 bg-white rounded-lg my-4">
             {imageUrl && <div className="relative inline-block">
               <img className="w-50 h-40" src={imageUrl} alt="Image" />
@@ -135,12 +116,12 @@ export default function ChatBot() {
               />
             </div>}
             <div className="flex items-center justify-between bg-white rounded-lg shadow-gray-50">
-              <input
-                onChange={(e) => { setQuery(e.target.value) }}
-                value={query}
-                placeholder="Enter some query"
-                className="w-full py-2 px-4 rounded focus:outline-none"
-                onKeyDown={(e) => { e.key == "Enter" ? handleAPICall() : null }}
+              <input 
+                onChange={(e) => { setQuery(e.target.value) }} 
+                value={query} 
+                placeholder="Enter some query" 
+                className="w-full py-2 px-4 rounded focus:outline-none" 
+                onKeyDown={(e)=>{e.key == "Enter" ? handleAPICall() : null}}
               />
               <div className="flex flex-row mx-5 space-x-5">
                 <input
