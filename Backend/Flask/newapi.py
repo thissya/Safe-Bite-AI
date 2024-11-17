@@ -13,12 +13,15 @@ import io
 import uvicorn
 import os
 from dotenv import load_dotenv
-from google.cloud import translate_v2 as translate
+from googletrans import Translator
+
 
 
 load_dotenv()
 
 app = FastAPI()
+
+translator = Translator()
 
 class ValidateRequest(BaseModel):
     user_id: str
@@ -33,14 +36,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Google Translate setup
-translate_client = translate.Client()
-
-def translate_text(text, target_language):
-    result = translate_client.translate(text, target_language=target_language)
-    return result["translatedText"]
-
-# Model setup
 model = "/kaggle/input/llama-3/transformers/8b-chat-hf/1"
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline = transformers.pipeline(
@@ -97,6 +92,11 @@ system_message = """
     Your goal is to enhance the user's ability to make informed decisions about their diet, improving their overall health and well-being through convenience and accuracy.
     dont return the text in the json format."""
 
+def tamil_translate(text):
+    global translator
+    tamil_text = translator.translate(text, src='en', dest='ta').text
+    return tamil_text
+
 @app.post('/message')
 async def message(request: ValidateRequest):
     try:
@@ -106,9 +106,9 @@ async def message(request: ValidateRequest):
         target_language = request.language
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
         response, updated_history = query_model(system_message, user_message, history)
-        user_histories[user_id] = updated_history[-3:]
+        user_histories[user_id] = updated_history[-3:]  # Keep the last 3 interactions
         if target_language == "ta":
-            response = translate_text(response, "ta")
+            response = tamil_translate(response)  # Translate to Tamil if needed
         return JSONResponse(status_code=200, content={"response": response})
     except Exception as e:
         print(e)
@@ -119,17 +119,21 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
     try:
         global user_histories
         image_content = await image.read()
+        
         with Image.open(io.BytesIO(image_content)) as img:
             img = img.convert("RGB")
             img.save("image.jpg")
         
         extracted_text = ocr_utils.extract_text_from_image("image.jpg")
+        
         query = f"Extracted ingredients: {extracted_text}. {message} Provide suggestions in 200 words."
         history = user_histories.get(user_id, [{"role": "system", "content": system_message}])
+        
         response, updated_history = query_model(system_message, query, history)
-        user_histories[user_id] = updated_history[-3:]
+        user_histories[user_id] = updated_history[-3:] 
+        
         if language == "ta":
-            response = translate_text(response, "ta")
+            response = tamil_translate(response) 
         return JSONResponse(status_code=200, content={"response": response})
     except Exception as e:
         print(e)
