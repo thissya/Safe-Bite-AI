@@ -100,24 +100,30 @@ export default function ChatBot() {
         <Navbar />
         <div className="flex flex-col px-4 justify-between w-full h-full">
           <div className="flex flex-row items-end justify-between">
-            <button>
-              <div className="text-center" onClick={() => { setLanguage("english") }}>English</div>
+            <button
+              className={`px-4 py-2 ${language === "english" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+              onClick={() => setLanguage("english")}
+            >
+              English
             </button>
-
-            <button>
-              <div className="text-center" onClick={() => { setLanguage("tamil") }}>தமிழ்</div>
+            <button
+              className={`px-4 py-2 ${language === "tamil" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+              onClick={() => setLanguage("tamil")}
+            >
+              தமிழ்
             </button>
-
           </div>
+
           <div className="flex flex-col overflow-y-auto mb-3 mt-1">
             {messages.map((val, index) => (
               <>
-                {val.user == "user" && <UserInputBubble key={index} user={val} />}
-                {val.user == "bot" && <BotMessageBubble key={index} bot={val} />}
+                {val.user === "user" && <UserInputBubble key={index} user={val} />}
+                {val.user === "bot" && <BotMessageBubble key={index} bot={val} />}
               </>
             ))}
             <div ref={messageEndRef}></div>
           </div>
+
           <div className="p-2 bg-white rounded-lg my-4">
             {imageUrl && <div className="relative inline-block">
               <img className="w-50 h-40" src={imageUrl} alt="Image" />
