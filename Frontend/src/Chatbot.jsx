@@ -99,7 +99,7 @@ export default function ChatBot() {
       <div className="flex bg-slate-300 h-screen w-screen">
         <Navbar />
         <div className="flex flex-col px-4 justify-between w-full h-full">
-          <div className="flex flex-row items-end justify-between">
+          <div className="flex flex-col items-end justify-between">
             <button
               className={`px-4 py-2 ${language === "english" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
               onClick={() => setLanguage("english")}

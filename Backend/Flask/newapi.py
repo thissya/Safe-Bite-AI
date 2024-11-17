@@ -93,6 +93,7 @@ system_message = """
 
 @app.post('/message')
 async def message(request: ValidateRequest):
+    print("Incoming Request:", request.json())
     try:
         global user_histories
         user_id = request.user_id
@@ -102,19 +103,27 @@ async def message(request: ValidateRequest):
         response, updated_history = query_model(system_message, user_message, history)
         user_histories[user_id] = updated_history[-3:]  
 
-        if language.lower() == "tamil":
-            return JSONResponse(status_code=200, content={"response": translator.translate(response, src='en', dest='ta').text})
-        elif language.lower() == "english": 
-            return JSONResponse(status_code=200, content={"response": response})
-        else:
-            return JSONResponse(status_code=400, content={"response": "Error in Language Selection"})
-
+        try:
+            print(f"Translating response to {language}: {response}")
+            if language.lower() == "tamil":
+                translated_response = translator.translate(response, src='en', dest='ta').text
+                print(f"Translated Response: {translated_response}")
+            elif language.lower() == "english":
+                translated_response = response
+            else:
+                raise ValueError("Unsupported language")
+            return JSONResponse(status_code=200, content={"response": translated_response})
+        except Exception as e:
+            print(f"Translation Error: {e}")
+            return JSONResponse(status_code=500, content={"response": "Translation failed. Please try again."})
+        
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post('/chat')
 async def chat(user_id: str = Form(...), image: UploadFile = File(...), message: str = Form(...),language: str = Form(...)):
+    print(f"User ID: {user_id}, Message: {message}, Language: {language}")
     try:
         global user_histories
         image_content = await image.read()
@@ -132,15 +141,20 @@ async def chat(user_id: str = Form(...), image: UploadFile = File(...), message:
         response, updated_history = query_model(system_message, query, history)
         user_histories[user_id] = updated_history[-3:]
 
-        if language.lower() == "tamil":
-            response = translator.translate(response, src='en', dest='ta').text 
-            print(response)
-            return JSONResponse(status_code=200, content={"response": response})
-        elif language.lower() == "english": 
-            return JSONResponse(status_code=200, content={"response": response})
-        else:
-            return JSONResponse(status_code=400, content={"response": "Error in Language Selection"})
-        
+        try:
+            print(f"Translating response to {language}: {response}")
+            if language.lower() == "tamil":
+                translated_response = translator.translate(response, src='en', dest='ta').text
+                print(f"Translated Response: {translated_response}")
+            elif language.lower() == "english":
+                translated_response = response
+            else:
+                raise ValueError("Unsupported language")
+            return JSONResponse(status_code=200, content={"response": translated_response})
+        except Exception as e:
+            print(f"Translation Error: {e}")
+            return JSONResponse(status_code=500, content={"response": "Translation failed. Please try again."})
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
