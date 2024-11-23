@@ -6,6 +6,7 @@ import ChatBot from './Chatbot';
 import { UserProvider } from './Context';
 import AxiosSetup from './AxiosSetup';
 import Update from './Update';
+import Portfolio from './portfolio/Portfolio';
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
       <UserProvider>
         <AxiosSetup />
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Portfolio />}/>
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/chatbot" element={<ChatBot />} />

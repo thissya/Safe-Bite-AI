@@ -15,7 +15,7 @@ export default function ChatBot() {
   const [imageUrl, setImageUrl] = useState(null);
   const [query, setQuery] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [language, setLanguage] = useState("en"); // Default to English
+  const [language, setLanguage] = useState("en");
 
   useEffect(() => {
     if (messageEndRef.current) {
@@ -44,7 +44,7 @@ export default function ChatBot() {
         formData.append("image", image);
         formData.append("user_id", `${userId} The user info is ${JSON.stringify(userInfo)}`);
         formData.append("message", query);
-        formData.append("language", language); // Include selected language
+        formData.append("language", language);
 
         setImage(null);
         setImageUrl(null);
@@ -64,7 +64,7 @@ export default function ChatBot() {
         const tempObj = {
           user_id: userId,
           message: `${query} The user info is ${JSON.stringify(userInfo)}`,
-          language, // Include selected language
+          language,
         };
 
         setQuery("");
@@ -90,6 +90,20 @@ export default function ChatBot() {
       <div className="flex bg-slate-300 h-screen w-screen">
         <Navbar />
         <div className="flex flex-col px-4 justify-between w-full h-full">
+          <div className="flex flex-row  m-1 justify-end ">
+            <div className="flex flex-col items-center">
+              <h1 className="text-black"><b>Language</b></h1>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="py-2 px-4 border rounded"
+              >
+                <option value="en"><b>English</b></option>
+                <option value="ta"><b>தமிழ்</b></option>
+              </select>
+
+            </div>
+          </div>
           <div className="flex flex-col overflow-y-auto mb-3 mt-1">
             {messages.map((val, index) => (
               <>
@@ -124,14 +138,7 @@ export default function ChatBot() {
                   if (e.key === "Enter") handleAPICall();
                 }}
               />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="py-2 px-4 border rounded"
-              >
-                <option value="en">English</option>
-                <option value="ta">தமிழ்</option>
-              </select>
+
               <div className="flex flex-row mx-5 space-x-5">
                 <input
                   type="file"
