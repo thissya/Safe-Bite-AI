@@ -1,6 +1,9 @@
 import VerticalNavbar from "./VerticalNavbar";
 import Home from "./Home";
 import About from "./About";
+import Contact from "./Contact";
+import Emailpage from "./Emailpage";
+import Footer from "./Footer";
 
 function Portfolio() {
     return (
@@ -12,6 +15,9 @@ function Portfolio() {
                 <VerticalNavbar/>
                 <Home/>
                 <About/>
+                <Contact/>
+                <Emailpage/>
+                <Footer/>
             </div>
         </div>
     );
