@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage("");
     try {
-      const response = await axios.post("http://localhost:3000/api/login", {
+      const response = await axios.post("https://food-safety-checker.onrender.com/api/login", {
         email: e.target.email.value,
         password: e.target.password.value,
       });

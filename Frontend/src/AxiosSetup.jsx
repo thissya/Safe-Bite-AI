@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 const AxiosSetup = () => {
   const { token, setToken, Auth, setAuth, userInfo, setUserInfo } = useUser();
-  axios.defaults.baseURL = 'http://localhost:3000/api';
+  axios.defaults.baseURL = 'https://food-safety-checker.onrender.com/api';
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use(
