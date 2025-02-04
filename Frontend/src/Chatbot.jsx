@@ -202,12 +202,12 @@ export default function ChatBot() {
                 />
               </div>
             )}
-            <div className="flex items-center justify-between bg-neutral-500 rounded-lg shadow-gray-50">
+            <div className="flex items-center justify-between bg-neutral-500 rounded-lg bg-purple-100">
               <input
                 onChange={(e) => setQuery(e.target.value)}
                 value={query}
-                placeholder="Enter some query"
-                className="w-full py-2 px-4 rounded focus:outline-none bg-slate-400 placeholder-neutral-950 font-mono"
+                placeholder="Enter some Query"
+                className="w-full py-2 px-4 rounded focus:outline-none bg-purple-200 placeholder-neutral-950 font-mono"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleAPICall();
                 }}
